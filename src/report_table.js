@@ -90,7 +90,10 @@ const buildReportTable = function (
     console.log('Column Info:', dataTable.getTableRowColumns(dataTable.getDataRows()[0]));
 
     dataTable.getDataRows().forEach(row => {
-      dataTable.getTableRowColumns(row).forEach(cell => {
+      const rowData = row.data
+
+      Object.keys(rowData).forEach(key => {
+        const cell = rowData[key];
         console.log('Valor da célula:', cell.value);
         console.log('Tipo da célula:', typeof cell.value);
         if (typeof cell.value === 'number') {
@@ -98,6 +101,7 @@ const buildReportTable = function (
         }
       });
     });
+    
     console.log(values);
     return {
       min: d3.min(values),
