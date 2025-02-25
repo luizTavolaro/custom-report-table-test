@@ -85,6 +85,10 @@ const buildReportTable = function (
 
   const getMinMaxValues = () => {
     const values = [];
+    
+    console.log('Data Rows:', dataTable.getDataRows());
+    console.log('Column Info:', dataTable.getTableRowColumns(dataTable.getDataRows()[0]));
+
     dataTable.getDataRows().forEach(row => {
       dataTable.getTableRowColumns(row).forEach(cell => {
         console.log('Valor da célula:', cell.value);
