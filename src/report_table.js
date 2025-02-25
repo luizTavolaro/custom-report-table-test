@@ -87,11 +87,14 @@ const buildReportTable = function (
     const values = [];
     dataTable.getDataRows().forEach(row => {
       dataTable.getTableRowColumns(row).forEach(cell => {
+        console.log('Valor da célula:', cell.value);
+        console.log('Tipo da célula:', typeof cell.value);
         if (typeof cell.value === 'number') {
           values.push(cell.value);
         }
       });
     });
+    console.log(values);
     return {
       min: d3.min(values),
       max: d3.max(values)
