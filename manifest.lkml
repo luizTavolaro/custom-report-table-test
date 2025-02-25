@@ -6,12 +6,12 @@ constant: VIS_LABEL {
 }
 
 constant: VIS_ID {
-  value: "report_table-marketplace-test2"
+  value: "report_table-marketplace-custom-test"
   export:  override_optional
 }
 
 visualization: {
   id: "@{VIS_ID}"
-  file: "src/report_table.js"
   label: "@{VIS_LABEL}"
+  file: "src/report_table.js"
 }
