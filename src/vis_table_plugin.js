@@ -277,6 +277,8 @@ class VisPluginTableModel {
         : false;
 
     this.transposeTable = config.transposeTable || false;
+    this.heatmapColorStart = config.heatmapColorStart || '#c3dcf5';
+    this.heatmapColorEnd = config.heatmapColorEnd || '#4381ff';
 
     var col_idx = 0;
     this.addPivotsAndHeaders(queryResponse);
