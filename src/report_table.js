@@ -1,5 +1,5 @@
 import {VisPluginTableModel} from './vis_table_plugin';
-import * as d3 from './d3loader';
+import * as d3 from 'd3';
 
 const themes = {
   traditional: require('./theme_traditional.css'),
