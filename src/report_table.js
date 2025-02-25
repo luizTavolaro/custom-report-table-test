@@ -90,7 +90,7 @@ const buildReportTable = function (
     console.log('Column Info:', dataTable.getTableRowColumns(dataTable.getDataRows()[0]));
 
     dataTable.getDataRows().forEach(row => {
-      dataTable.getTableRowColumns(row).forEach(cell => {
+      row.data.forEach(cell => {
         console.log('Valor da célula:', cell.value);
         console.log('Tipo da célula:', typeof cell.value);
         if (typeof cell.value === 'number') {
@@ -98,6 +98,17 @@ const buildReportTable = function (
         }
       });
     });
+
+    // dataTable.getDataRows().forEach(row => {
+    //   dataTable.getTableRowColumns(row).forEach(cell => {
+    //     console.log('Valor da célula:', cell.value);
+    //     console.log('Tipo da célula:', typeof cell.value);
+    //     if (typeof cell.value === 'number') {
+    //       values.push(cell.value);
+    //     }
+    //   });
+    // });
+
     console.log(values);
     return {
       min: d3.min(values),
