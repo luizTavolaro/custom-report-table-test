@@ -190,6 +190,18 @@ const tableModelCoreOptions = {
     default: false,
     order: 100,
   },
+  heatmapColorStart: {
+    type: "string",
+    label: "Cor inicial para Heatmap (valores baixos)",
+    display: "color",
+    default: "#f5f5f5"
+  },
+  heatmapColorEnd: {
+    type: "string",
+    label: "Cor final para Heatmap (valores altos)",
+    display: "color",
+    default: "#FF4500"
+  },
 };
 /**
  * Represents an "enriched data object" with additional methods and properties for data vis

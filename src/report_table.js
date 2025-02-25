@@ -118,10 +118,14 @@ const buildReportTable = function (
   const { min, max } = getMinMaxValues();
 
   console.log("min: ", min, "max: ", max);
+
+  const colorStart = config.heatmapColorStart || '#c3dcf5'
+  const colorEnd = config.heatmapColorEnd || '#4381ff';  
   
   const renderTable = async function () {
-    const colorScale = d3.scaleSequential(d3.interpolateRdYlGn)
-      .domain([min, max]);
+    const colorScale = d3.scaleSequential()
+      .domain([min, max])
+      .interpolator(d3.interpolateRgb(colorStart, colorEnd));
 
     const getTextWidth = function (text, font = '') {
       // re-use canvas object for better performance
