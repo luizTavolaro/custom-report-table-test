@@ -292,12 +292,17 @@ const buildReportTable = function (
       .append('tr')
       .on('mouseover', function () {
         if (dataTable.showHighlight) {
-          this.classList.toggle('hover');
+          d3.select(this)
+            .style('position', 'relative')
+            .style('z-index', '1')
+            .style('box-shadow', '0 0 5px rgba(0, 0, 0, 0.2)');
         }
       })
       .on('mouseout', function () {
         if (dataTable.showHighlight) {
-          this.classList.toggle('hover');
+          d3.select(this)
+            .style('z-index', '0')
+            .style('box-shadow', 'none');
         }
       })
       .selectAll('td')
