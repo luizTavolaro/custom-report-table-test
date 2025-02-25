@@ -12,6 +12,6 @@ constant: VIS_ID {
 
 visualization: {
   id: "@{VIS_ID}"
-  url: "https://marketplace-api.looker.com/viz-dist/report_table.js"
+  file: "src/report_table.js"
   label: "@{VIS_LABEL}"
 }
