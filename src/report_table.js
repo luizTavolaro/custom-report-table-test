@@ -1,173 +1,651 @@
-function _1(md){return(
-md`<div style="color: grey; font: 13px/25.5px var(--sans-serif); text-transform: uppercase;"><h1 style="display: none;">Stacked-to-grouped bars</h1><a href="https://d3js.org/">D3</a> › <a href="/@d3/gallery">Gallery</a></div>
+  import {VisPluginTableModel} from './vis_table_plugin';
+  import * as d3 from './d3loader';
 
-# Stacked-to-grouped bars
+  const themes = {
+    traditional: require('./theme_traditional.css'),
+    looker: require('./theme_looker.css'),
+    contemporary: require('./theme_contemporary.css'),
 
-Animations can preserve object constancy, allowing the reader to follow the data across views. See [Heer and Robertson](http://vis.berkeley.edu/papers/animated_transitions/) for more.`
-)}
+    fixed: require('./layout_fixed.css'),
+    auto: require('./layout_auto.css'),
+  };
 
-function _layout(Inputs)
-{
-  const form = Inputs.radio(
-    new Map(["stacked", "grouped"].map((t) => [`${t[0].toUpperCase()}${t.slice(1)}`, t])),
-    {value: "stacked"}
-  );
-  const interval = setInterval(() => {
-    form.value = form.value === "grouped" ? "stacked" : "grouped";
-    form.dispatchEvent(new CustomEvent("input"));
-  }, 2000);
-  form.oninput = (event) => event.isTrusted && clearInterval(interval);
-  return form;
-}
+  const BBOX_X_ADJUST = 10;
+  const BBOX_Y_ADJUST = 10;
 
+  const use_minicharts = false;
 
-function _chart(d3,n,yz,xz)
-{
+  const removeStyles = async function () {
+    const links = document.getElementsByTagName('link');
+    while (links[0]) links[0].parentNode.removeChild(links[0]);
 
-  const width = 928;
-  const height = 500;
-  const marginTop = 0;
-  const marginRight = 0;
-  const marginBottom = 10;
-  const marginLeft = 0;
+    Object.keys(themes).forEach(async theme => await themes[theme].unuse());
+  };
 
-  const y01z = d3.stack()
-      .keys(d3.range(n))
-    (d3.transpose(yz)) // stacked yz
-    .map((data, i) => data.map(([y0, y1]) => [y0, y1, i]));
+  const loadStylesheet = function (link) {
+    const linkElement = document.createElement('link');
 
-  const yMax = d3.max(yz, y => d3.max(y));
-  const y1Max = d3.max(y01z, y => d3.max(y, d => d[1]));
+    linkElement.setAttribute('rel', 'stylesheet');
+    linkElement.setAttribute('href', link);
 
-  const x = d3.scaleBand()
-      .domain(xz)
-      .rangeRound([marginLeft, width - marginRight])
-      .padding(0.08);
+    document.getElementsByTagName('head')[0].appendChild(linkElement);
+  };
 
-  const y = d3.scaleLinear()
-      .domain([0, y1Max])
-      .range([height - marginBottom, marginTop]);
+  const buildReportTable = function (
+    config,
+    dataTable,
+    updateColumnOrder,
+    element
+  ) {
+    var dropTarget = null;
+    const bounds = element.getBoundingClientRect();
+    const chartCentreX = bounds.x + bounds.width / 2;
+    const chartCentreY = bounds.y + bounds.height / 2;
 
-  const color = d3.scaleSequential(d3.interpolateBlues)
-      .domain([-0.5 * n, 1.5 * n]);
+    removeStyles().then(() => {
+      if (
+        typeof config.customTheme !== 'undefined' &&
+        config.customTheme &&
+        config.theme === 'custom'
+      ) {
+        loadStylesheet(config.customTheme);
+      } else if (typeof themes[config.theme] !== 'undefined') {
+        themes[config.theme].use();
+      }
+      if (typeof themes[config.layout] !== 'undefined') {
+        themes[config.layout].use();
+      }
+    });
 
-  const svg = d3.create("svg")
-      .attr("viewBox", [0, 0, width, height])
-      .attr("width", width)
-      .attr("height", height)
-      .attr("style", "max-width: 100%; height: auto;");
+    // Sort group based on sort order from looker
+    const sortByColumnSeries = function (group) {
+      // transposing interim fix...if transpose is ON, then return group
+      // dataTable.column_series would be undefined in this case
+      if (dataTable.transposeTable) {
+        return group;
+      }
 
-  const rect = svg.selectAll("g")
-    .data(y01z)
-    .join("g")
-      .attr("fill", (d, i) => color(i))
-    .selectAll("rect")
-    .data(d => d)
-    .join("rect")
-      .attr("x", (d, i) => x(i))
-      .attr("y", height - marginBottom)
-      .attr("width", x.bandwidth())
-      .attr("height", 0);
+      // Get sort order from column series
+      const columnSeriesOrder = (dataTable.column_series || []).map(
+        col => col.column.id
+      );
 
-  svg.append("g")
-      .attr("transform", `translate(0,${height - marginBottom})`)
-      .call(d3.axisBottom(x).tickSizeOuter(0).tickFormat(() => ""));
+      // Build new array of group data in same order as column_series
+      const orderedGroup = [];
+      columnSeriesOrder.forEach(colName => {
+        group.forEach(group => {
+          // colName will never equal group.id
+          if (colName === group.id) {
+            orderedGroup.push(group);
+          }
+        });
+      });
+      return orderedGroup;
+    };
 
-  function transitionGrouped() {
-    y.domain([0, yMax]);
+    const renderTable = async function () {
+      const getTextWidth = function (text, font = '') {
+        // re-use canvas object for better performance
+        var canvas =
+          getTextWidth.canvas ||
+          (getTextWidth.canvas = document.createElement('canvas'));
+        var context = canvas.getContext('2d');
+        context.font = font || config.bodyFontSize + 'pt arial';
+        var metrics = context.measureText(text);
+        return metrics.width;
+      };
 
-    rect.transition()
-        .duration(500)
-        .delay((d, i) => i * 20)
-        .attr("x", (d, i) => x(i) + x.bandwidth() / n * d[2])
-        .attr("width", x.bandwidth() / n)
-      .transition()
-        .attr("y", d => y(d[1] - d[0]))
-        .attr("height", d => y(0) - y(d[1] - d[0]));
-  }
+      var table = d3
+        .select('#visContainer')
+        .append('table')
+        .attr('id', 'reportTable')
+        .attr('class', 'reportTable')
+        .style('opacity', 0);
 
-  function transitionStacked() {
-    y.domain([0, y1Max]);
+      var drag = d3
+        .drag()
+        .on('start', (source, idx) => {
+          if (!dataTable.has_pivots && source.colspan === 1) {
+            // if a headercell is a merged cell, can't tell which column its associated with
+            var xPosition = parseFloat(d3.event.x);
+            var yPosition = parseFloat(d3.event.y);
+            var html = source.column.getHeaderCellLabelByType('field');
 
-    rect.transition()
-        .duration(500)
-        .delay((d, i) => i * 20)
-        .attr("y", d => y(d[1]))
-        .attr("height", d => y(d[0]) - y(d[1]))
-      .transition()
-        .attr("x", (d, i) => x(i))
-        .attr("width", x.bandwidth());
-  }
+            d3.select('#tooltip')
+              .style('left', xPosition + 'px')
+              .style('top', yPosition + 'px')
+              .html(html);
 
-  function update(layout) {
-    if (layout === "stacked") transitionStacked();
-    else transitionGrouped();
-  }
+            d3.select('#tooltip').classed('hidden', false);
+          }
+        })
+        .on('drag', (source, idx) => {
+          // console.log('drag event', source, idx, d3.event.x, d3.event.y)
+          if (!dataTable.has_pivots) {
+            d3.select('#tooltip')
+              .style('left', d3.event.x + 'px')
+              .style('top', d3.event.y + 'px');
+          }
+        })
+        .on('end', (source, idx) => {
+          if (!dataTable.has_pivots) {
+            d3.select('#tooltip').classed('hidden', true);
+            var movingColumn = source.column;
+            var targetColumn = dropTarget.column;
+            var movingIdx = Math.floor(movingColumn.pos / 10) * 10;
+            var targetIdx = Math.floor(targetColumn.pos / 10) * 10;
+            // console.log('DRAG FROM', movingColumn, movingIdx, 'TO', targetColumn, targetIdx)
+            dataTable.moveColumns(movingIdx, targetIdx, updateColumnOrder);
+          }
+        });
 
-  return Object.assign(svg.node(), {update});
-}
+      if (dataTable.minWidthForIndexColumns) {
+        var columnTextWidths = {};
 
+        if (!dataTable.transposeTable) {
+          dataTable.column_series
+            .filter(cs => !cs.column.hide)
+            .filter(cs => cs.column.modelField.type === 'dimension')
+            .forEach(cs => {
+              var maxLength = cs.series.values.reduce((a, b) =>
+                Math.max(getTextWidth(a), getTextWidth(b))
+              );
+              var columnId = cs.column.modelField.name;
+              if (dataTable.useIndexColumn) {
+                columnId = '$$$_index_$$$';
+                maxLength += 15;
+              }
+              columnTextWidths[columnId] = Math.ceil(maxLength);
+            });
+        } else {
+          dataTable.headers.forEach(header => {
+            var fontSize = 'bold ' + config.bodyFontSize + 'pt arial';
+            var maxLength = dataTable.transposed_data
+              .map(row => row.data[header.type].rendered)
+              .reduce((a, b) =>
+                Math.max(getTextWidth(a, fontSize), getTextWidth(b, fontSize))
+              );
+            columnTextWidths[header.type] = Math.ceil(maxLength);
+          });
+        }
+      }
 
-function _update(chart,layout){return(
-chart.update(layout)
-)}
+      var column_groups = table
+        .selectAll('colgroup')
+        .data(dataTable.getTableColumnGroups())
+        .enter()
+        .append('colgroup');
 
-function _xz(d3,m){return(
-d3.range(m)
-)}
+      column_groups
+        .selectAll('col')
+        .data(d => d)
+        .enter()
+        .append('col')
+        .attr('id', d => ['col', d.id].join('').replace('.', ''))
+        .attr('span', 1)
+        .style('width', d => {
+          if (
+            dataTable.minWidthForIndexColumns &&
+            d.type === 'index' &&
+            typeof columnTextWidths[d.id] !== 'undefined'
+          ) {
+            return columnTextWidths[d.id] + 'px';
+          } else {
+            return '';
+          }
+        });
+      var header_rows = table
+        .append('thead')
+        .selectAll('tr')
+        .data(dataTable.getHeaderTiers())
+        .enter();
 
-function _yz(d3,n,bumps,m){return(
-d3.range(n).map(() => bumps(m))
-)}
+      var header_cells = header_rows
+        .append('tr')
+        .selectAll('th')
+        .data((level, i) =>
+          dataTable.getTableHeaderCells(i).map(column => column.levels[i])
+        )
+        // FIXME: This breaks a lot of stuff. We need to fix this feature
+        // before making a release.
+        // .data((level, i) => sortByColumnSeries(dataTable.getTableHeaderCells(i)).map( column => column.levels[i]))
+        .enter();
 
-function _n(){return(
-5
-)}
+      header_cells
+        .append('th')
+        .text(d => d.label)
+        .attr('id', d => d.id)
+        .attr('colspan', d => d.colspan)
+        .attr('rowspan', d => d.rowspan)
+        .attr('class', d => {
+          var classes = ['reportTable'];
+          if (typeof d.cell_style !== 'undefined') {
+            classes = classes.concat(d.cell_style);
+          }
+          return classes.join(' ');
+        })
+        .style('text-align', 'left')
+        .style('font-size', config.headerFontSize + 'px')
+        .attr('draggable', true)
+        .call(drag)
+        .on('mouseover', function(cell) {
+          d3.select('#tooltip')
+              .style('left', d3.event.x + 'px')
+              .style('top', d3.event.y + 'px')
+              .html(cell.label);
+          d3.select('#tooltip').classed('hidden', false);
+          return dropTarget = cell
+        })
+        .on('mouseout', function(cell) {
+          d3.select('#tooltip').classed('hidden', true);
+          return dropTarget = null
+        });
 
-function _m(){return(
-58
-)}
+      var table_rows = table
+        .append('tbody')
+        .selectAll('tr')
+        .data(dataTable.getDataRows())
+        .enter()
+        .append('tr')
+        .on('mouseover', function () {
+          if (dataTable.showHighlight) {
+            this.classList.toggle('hover');
+          }
+        })
+        .on('mouseout', function () {
+          if (dataTable.showHighlight) {
+            this.classList.toggle('hover');
+          }
+        })
+        .selectAll('td')
+        .data(row =>
+          dataTable.getTableRowColumns(row).map(column => row.data[column.id])
+        )
+        // .data(row =>
+        //   sortByColumnSeries(dataTable.getTableRowColumns(row)).map(
+        //     column => row.data[column.id]
+        //   )
+        // )
+        .enter();
 
-function _bumps(){return(
-function bumps(m) {
-  const values = [];
+      table_rows
+        .append('td')
+        .text(d => {
+          var text = '';
+          if (Array.isArray(d.value)) {
+            // cell is a list or number_list
+            text = !(d.rendered === null) ? d.rendered : d.value.join(' ');
+          } else if (
+            typeof d.value === 'object' &&
+            d.value !== null &&
+            typeof d.value.series !== 'undefined'
+          ) {
+            // cell is a turtle
+            text = null;
+          } else if (d.html) {
+            // cell has HTML defined
+            var parser = new DOMParser();
+            var parsed_html = parser.parseFromString(d.html, 'text/html');
+            text = parsed_html.documentElement.textContent;
+          } else if (d.rendered || d.rendered === '') {
+            // could be deliberate choice to render empty string
+            text = d.rendered;
+          } else {
+            text = d.value;
+          }
+          text = String(text);
+          return text ? text.replace('-', '\u2011') : text; // prevents wrapping on minus sign / hyphen
+        })
+        .attr('rowspan', d => d.rowspan)
+        .attr('colspan', d => d.colspan)
+        .style('text-align', d => d.align)
+        .style('font-size', config.bodyFontSize + 'px')
+        .attr('class', d => {
+          var classes = ['reportTable'];
+          if (typeof d.value === 'object') {
+            classes.push('cellSeries');
+          }
+          if (typeof d.align !== 'undefined') {
+            classes.push(d.align);
+          }
+          if (typeof d.cell_style !== 'undefined') {
+            classes = classes.concat(d.cell_style);
+          }
+          return classes.join(' ');
+        })
+        .on('mouseover', d => {
+          if (dataTable.showHighlight) {
+            if (!dataTable.transposeTable) {
+              var id = ['col', d.colid].join('').replace('.', '');
+            } else {
+              var id = ['col', d.rowid].join('').replace('.', '');
+            }
 
-  // Initialize with uniform random values in [0.1, 0.2).
-  for (let i = 0; i < m; ++i) {
-    values[i] = 0.1 + 0.1 * Math.random();
-  }
+            var colElement = document.getElementById(id);
+            colElement.classList.toggle('hover');
+          }
 
-  // Add five random bumps.
-  for (let j = 0; j < 5; ++j) {
-    const x = 1 / (0.1 + Math.random());
-    const y = 2 * Math.random() - 0.5;
-    const z = 10 / (0.1 + Math.random());
-    for (let i = 0; i < m; i++) {
-      const w = (i / m - y) * z;
-      values[i] += x * Math.exp(-w * w);
-    }
-  }
+          if (dataTable.showTooltip && d.cell_style.includes('measure')) {
+            var x = d3.event.clientX;
+            var y = d3.event.clientY;
+            var html = dataTable.getCellToolTip(d.rowid, d.colid);
 
-  // Ensure all values are positive.
-  for (let i = 0; i < m; ++i) {
-    values[i] = Math.max(0, values[i]);
-  }
+            d3.select('#tooltip')
+              .style('left', x + 'px')
+              .style('top', y + 'px')
+              .html(html);
 
-  return values;
-}
-)}
+            d3.select('#tooltip').classed('hidden', false);
+          }
+        })
+        .on('mousemove', d => {
+          if (dataTable.showTooltip && d.cell_style.includes('measure')) {
+            var tooltip = d3.select('#tooltip');
+            var x =
+              d3.event.clientX < chartCentreX
+                ? d3.event.pageX + 10
+                : d3.event.pageX -
+                  tooltip.node().getBoundingClientRect().width -
+                  10;
+            var y =
+              d3.event.clientY < chartCentreY
+                ? d3.event.pageY + 10
+                : d3.event.pageY -
+                  tooltip.node().getBoundingClientRect().height -
+                  10;
 
-export default function define(runtime, observer) {
-  const main = runtime.module();
-  main.variable(observer()).define(["md"], _1);
-  main.variable(observer("viewof layout")).define("viewof layout", ["Inputs"], _layout);
-  main.variable(observer("layout")).define("layout", ["Generators", "viewof layout"], (G, _) => G.input(_));
-  main.variable(observer("chart")).define("chart", ["d3","n","yz","xz"], _chart);
-  main.variable(observer("update")).define("update", ["chart","layout"], _update);
-  main.variable(observer("xz")).define("xz", ["d3","m"], _xz);
-  main.variable(observer("yz")).define("yz", ["d3","n","bumps","m"], _yz);
-  main.variable(observer("n")).define("n", _n);
-  main.variable(observer("m")).define("m", _m);
-  main.variable(observer("bumps")).define("bumps", _bumps);
-  return main;
-}
+            tooltip.style('left', x + 'px').style('top', y + 'px');
+          }
+        })
+        .on('mouseout', d => {
+          if (dataTable.showHighlight) {
+            if (!dataTable.transposeTable) {
+              var id = ['col', d.colid].join('').replace('.', '');
+            } else {
+              var id = ['col', d.rowid].join('').replace('.', '');
+            }
+            var colElement = document.getElementById(id);
+            colElement.classList.toggle('hover');
+          }
+
+          if (dataTable.showTooltip && d.cell_style.includes('measure')) {
+            d3.select('#tooltip').classed('hidden', true);
+          }
+        })
+        .on('click', d => {
+          // Looker applies padding based on the top of the viz when opening a drill field but
+          // if part of the viz container is hidden underneath the iframe, the drill menu opens off screen
+          // We make a simple copy of the d3.event and account for pageYOffser as MouseEvent attributes are read only.
+          if (Array.isArray(d.links) && d.links.length > 0 && d.links[0].url) {
+              let event = {
+                metaKey: d3.event.metaKey,
+                pageX: d3.event.pageX,
+                pageY: d3.event.pageY - window.pageYOffset,
+              };
+              LookerCharts.Utils.openDrillMenu({
+                links: d.links,
+                event: event,
+              });
+            }
+
+        });
+
+      if (use_minicharts) {
+        var barHeight = 16;
+        var minicharts = table
+          .selectAll('.cellSeries')
+          .append('svg')
+          .attr('height', d => barHeight)
+          .attr('width', '100%')
+          .append('g')
+          .attr('class', '.cellSeriesChart')
+          .selectAll('rect')
+          .data(d => {
+            values = [];
+            for (var i = 0; i < d.value.series.keys.length; i++) {
+              values.push({
+                idx: i,
+                max: 10000,
+                key: d.value.series.keys[i],
+                value: d.value.series.values[i],
+                type: d.value.series.types[i],
+              });
+            }
+            return values.filter(value => value.type === 'line_item');
+          })
+          .enter();
+
+        var cellWidth = table.selectAll('.cellSeries')._groups[0][0].clientWidth;
+        var barWidth = Math.floor(cellWidth / 10);
+        // console.log('cellWidth', cellWidth)
+        // console.log('barHeight', barHeight)
+        // console.log('barWidth', barWidth)
+
+        minicharts
+          .append('rect')
+          .style('fill', 'steelblue')
+          .attr('x', value => {
+            return value.idx * barWidth;
+          })
+          .attr(
+            'y',
+            value => barHeight - Math.floor((value.value / value.max) * barHeight)
+          )
+          .attr('width', barWidth)
+          .attr('height', value =>
+            Math.floor((value.value / value.max) * barHeight)
+          );
+      }
+    };
+
+    const addOverlay = async function () {
+      var viewbox_width = document.getElementById('reportTable').clientWidth;
+      var viewbox_height = document.getElementById('reportTable').clientHeight;
+
+      var allRects = [];
+      d3.selectAll('th').select(function (d, i) {
+        if (typeof d !== 'undefined') {
+          var bbox = this.getBoundingClientRect();
+          allRects.push({
+            index: i,
+            data: d,
+            x: bbox.x - BBOX_X_ADJUST,
+            y: bbox.y - BBOX_Y_ADJUST,
+            width: bbox.width,
+            height: bbox.height,
+            html: this.innerHTML,
+            class: this.className + ' rectElem animated',
+            fontSize: config.headerFontSize,
+            align: this.style.textAlign,
+          });
+        }
+      });
+
+      d3.selectAll('td').select(function (d, i) {
+        if (typeof d !== 'undefined') {
+          var bbox = this.getBoundingClientRect();
+          allRects.push({
+            index: i,
+            data: d,
+            x: bbox.x - BBOX_X_ADJUST,
+            y: bbox.y - BBOX_Y_ADJUST,
+            width: bbox.width,
+            height: bbox.height,
+            html: this.innerHTML,
+            class: this.className + ' rectElem animated',
+            fontSize: config.bodyFontSize,
+            align: this.style.textAlign,
+          });
+        }
+      });
+
+      var overlay = d3
+        .select('#visSvg')
+        .attr('width', viewbox_width)
+        .attr('height', viewbox_height)
+        .selectAll('.rectElem')
+        .data(allRects, d => d.data.id)
+        .join(
+          enter =>
+            enter
+              .append('div')
+              .attr('class', d => d.class)
+              .style('opacity', 0.2)
+              .style('position', 'absolute')
+              .style('left', d => d.x + 'px')
+              .style('top', d => -2000)
+              .style('width', d => d.width + 'px')
+              .style('height', d => d.height + 'px')
+              .style('font-size', d => d.fontSize + 'px')
+              .style('text-align', d => d.align)
+              .text(d => d.html)
+              .call(enter =>
+                enter
+                  .transition()
+                  .duration(1000)
+                  .style('opacity', 1)
+                  .style('top', d => d.y + 'px')
+              ),
+          update =>
+            update.call(update =>
+              update
+                .transition()
+                .duration(1000)
+                .attr('class', d => d.class)
+                .style('opacity', 1)
+                .style('left', d => d.x + 'px')
+                .style('top', d => d.y + 'px')
+                .style('width', d => d.width + 'px')
+                .style('height', d => d.height + 'px')
+                .style('font-size', d => d.fontSize + 'px')
+                .style('text-align', d => d.align)
+                .text(d => d.html)
+            ),
+          exit =>
+            exit.call(exit =>
+              exit.transition().duration(500).style('opacity', 0).remove()
+            )
+        );
+    };
+
+    renderTable().then(() => {
+      document.getElementById('reportTable').classList.add('reveal');
+      if (config.customTheme === 'animate') {
+        document.getElementById('visSvg').classList.remove('hidden');
+        addOverlay();
+        // setTimeout(addOverlay(), 500)
+      } else {
+        document.getElementById('visSvg').classList.add('hidden');
+        document.getElementById('reportTable').style.opacity = 1;
+      }
+    });
+  };
+
+  looker.plugins.visualizations.add({
+    options: VisPluginTableModel.getCoreConfigOptions(),
+
+    create: function (element, config) {
+      this.svgContainer = d3
+        .select(element)
+        .append('div')
+        .attr('id', 'visSvg')
+        .attr('width', element.clientWidth)
+        .attr('height', element.clientHeight);
+
+      this.tooltip = d3
+        .select(element)
+        .append('div')
+        .attr('id', 'tooltip')
+        .attr('class', 'hidden');
+    },
+
+    updateAsync: function (data, element, config, queryResponse, details, done) {
+      const updateColumnOrder = newOrder => {
+        this.trigger('updateConfig', [{columnOrder: newOrder}]);
+      };
+
+      // ERROR HANDLING
+
+      this.clearErrors();
+
+      // empty pivot(s)...no measures
+      // FIXME: temporarily disabled until we test this feature.
+      // if (
+      //   queryResponse.fields.pivots.length > 0 &&
+      //   queryResponse.fields.measures.length === 0
+      // ) {
+      //   this.addError({
+      //     title: 'Empty Pivot(s)',
+      //     message: 'Add a measure or table calculation to pivot on.',
+      //   });
+      //   return;
+      // }
+
+      // max pivot check
+      if (queryResponse.fields.pivots.length > 2) {
+        this.addError({
+          title: 'Max Two Pivots',
+          message: 'This visualization accepts no more than 2 pivot fields.',
+        });
+        return;
+      }
+
+      // console.log('queryResponse', queryResponse)
+      // console.log('data', data)
+
+      // Check for results
+      if (!data.length) {
+        this.addError({
+          title: 'No Results',
+        });
+        return;
+      }
+
+      // INITIALISE THE VIS
+
+      try {
+        var elem = document.querySelector('#visContainer');
+        elem.parentNode.removeChild(elem);
+      } catch (e) {}
+
+      this.container = d3
+        .select(element)
+        .append('div')
+        .attr('id', 'visContainer');
+
+      if (typeof config.columnOrder === 'undefined') {
+        this.trigger('updateConfig', [{columnOrder: {}}]);
+      }
+
+      // Dashboard-next fails to register config if no one has touched it
+      // Check to reapply default settings to the config object
+      if (typeof config.theme === 'undefined') {
+        config = Object.assign(
+          {
+            bodyFontSize: 12,
+            headerFontSize: 12,
+            theme: 'traditional',
+            showHighlight: true,
+            showTooltip: true,
+          },
+          config
+        );
+      }
+
+      // BUILD THE VIS
+      // 1. Create object
+      // 2. Register options
+      // 3. Build vis
+
+      // console.log(config)
+      var dataTable = new VisPluginTableModel(data, queryResponse, config);
+      this.trigger('registerOptions', dataTable.getConfigOptions());
+      buildReportTable(config, dataTable, updateColumnOrder, element);
+
+      // DEBUG OUTPUT AND DONE
+      // console.log('dataTable', dataTable)
+      // console.log('container', document.getElementById('visContainer').parentNode)
+
+      done();
+    },
+  });
