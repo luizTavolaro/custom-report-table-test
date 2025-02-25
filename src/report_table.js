@@ -83,7 +83,25 @@ const buildReportTable = function (
     return orderedGroup;
   };
 
+  const getMinMaxValues = () => {
+    const values = [];
+    dataTable.getDataRows().forEach(row => {
+      dataTable.getTableRowColumns(row).forEach(cell => {
+        if (typeof cell.value === 'number') {
+          values.push(cell.value);
+        }
+      });
+    });
+    return {
+      min: d3.min(values),
+      max: d3.max(values)
+    };
+  };
+  
   const renderTable = async function () {
+    const colorScale = d3.scaleSequential(d3.interpolateRdYlGn)
+      .domain([minValue, maxValue]);
+
     const getTextWidth = function (text, font = '') {
       // re-use canvas object for better performance
       var canvas =
@@ -268,33 +286,29 @@ const buildReportTable = function (
       // )
       .enter();
 
-    table_rows
+      table_rows
       .append('td')
       .text(d => {
         var text = '';
         if (Array.isArray(d.value)) {
-          // cell is a list or number_list
           text = !(d.rendered === null) ? d.rendered : d.value.join(' ');
         } else if (
           typeof d.value === 'object' &&
           d.value !== null &&
           typeof d.value.series !== 'undefined'
         ) {
-          // cell is a turtle
           text = null;
         } else if (d.html) {
-          // cell has HTML defined
           var parser = new DOMParser();
           var parsed_html = parser.parseFromString(d.html, 'text/html');
           text = parsed_html.documentElement.textContent;
         } else if (d.rendered || d.rendered === '') {
-          // could be deliberate choice to render empty string
           text = d.rendered;
         } else {
           text = d.value;
         }
         text = String(text);
-        return text ? text.replace('-', '\u2011') : text; // prevents wrapping on minus sign / hyphen
+        return text ? text.replace('-', '\u2011') : text;
       })
       .attr('rowspan', d => d.rowspan)
       .attr('colspan', d => d.colspan)
@@ -312,6 +326,13 @@ const buildReportTable = function (
           classes = classes.concat(d.cell_style);
         }
         return classes.join(' ');
+      })
+      // Aqui é onde você aplica o Heatma
+      .style('background-color', d => {
+        if (typeof d.value === 'number') {
+          return colorScale(d.value);  // Aplica a cor conforme a escala
+        }
+        return 'transparent';
       })
       .on('mouseover', d => {
         if (dataTable.showHighlight) {
@@ -388,7 +409,7 @@ const buildReportTable = function (
           });
         }
       });
-
+    
     if (use_minicharts) {
       var barHeight = 16;
       var minicharts = table
