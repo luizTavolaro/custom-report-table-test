@@ -290,19 +290,16 @@ const buildReportTable = function (
       .data(dataTable.getDataRows())
       .enter()
       .append('tr')
+      .style('position', 'relative')
+      .style('z-index', '0')
       .on('mouseover', function () {
         if (dataTable.showHighlight) {
-          d3.select(this)
-            .style('position', 'relative')
-            .style('z-index', '1')
-            .style('box-shadow', '0 0 5px rgba(0, 0, 0, 0.2)');
+          this.classList.toggle('hover');
         }
       })
       .on('mouseout', function () {
         if (dataTable.showHighlight) {
-          d3.select(this)
-            .style('z-index', '0')
-            .style('box-shadow', 'none');
+          this.classList.toggle('hover');
         }
       })
       .selectAll('td')
