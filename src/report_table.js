@@ -90,9 +90,15 @@ const buildReportTable = function (
     console.log('Column Info:', dataTable.getTableRowColumns(dataTable.getDataRows()[0]));
 
     dataTable.getDataRows().forEach(row => {
+      if (row.id === "Total") {
+        return;
+      }
       const rowData = row.data
 
       Object.keys(rowData).forEach(key => {
+        if (key.startsWith('$$$_row_total_$$$')) {
+          return;
+        }
         const cell = rowData[key];
         console.log('Valor da célula:', cell.value);
         console.log('Tipo da célula:', typeof cell.value);
@@ -101,7 +107,7 @@ const buildReportTable = function (
         }
       });
     });
-    
+
     console.log(values);
     return {
       min: d3.min(values),
