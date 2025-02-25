@@ -191,16 +191,20 @@ const tableModelCoreOptions = {
     order: 100,
   },
   heatmapColorStart: {
+    section: 'Table',
     type: "string",
     label: "Cor inicial para Heatmap (valores baixos)",
     display: "color",
-    default: "#f5f5f5"
+    default: "#f5f5f5",
+    order: 100,
   },
   heatmapColorEnd: {
+    section: 'Table',
     type: "string",
     label: "Cor final para Heatmap (valores altos)",
     display: "color",
-    default: "#FF4500"
+    default: "#FF4500",
+    order: 100,
   },
 };
 /**
