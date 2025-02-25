@@ -13,5 +13,5 @@ constant: VIS_ID {
 visualization: {
   id: "@{VIS_ID}"
   label: "@{VIS_LABEL}"
-  file: "src/report_table.js"
+  file: "src/bundle.js"
 }
