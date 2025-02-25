@@ -6,6 +6,7 @@ import { transition } from 'd3-transition';
 import { drag } from 'd3-drag';
 import { scaleSequential } from 'd3-scale';             // Para escala de cores
 import { interpolateBlues } from 'd3-scale-chromatic';  // Para a paleta de cores azul
+import { min, max } from 'd3-array';
 
 // Exportação dos módulos importados
 export {

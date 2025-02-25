@@ -97,6 +97,8 @@ const buildReportTable = function (
       max: d3.max(values)
     };
   };
+
+  const { minValue, maxValue } = getMinMaxValues();
   
   const renderTable = async function () {
     const colorScale = d3.scaleSequential(d3.interpolateRdYlGn)
