@@ -4,3 +4,8 @@ node_modules/
 compile
 docs/testing.md
 dist/
+.babelrc
+package-lock.json
+package.json
+webpack.config.js
+yarn.lock
