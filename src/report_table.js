@@ -332,6 +332,7 @@ const buildReportTable = function (
       // Aqui é onde você aplica o Heatma
       .style('background-color', d => {
         if (typeof d.value === 'number') {
+          console.log('Valor: ', d.value, 'Cor: ', colorScale(d.value));
           return colorScale(d.value);  // Aplica a cor conforme a escala
         }
         return 'transparent';
