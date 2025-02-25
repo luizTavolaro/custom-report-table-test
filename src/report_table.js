@@ -98,13 +98,13 @@ const buildReportTable = function (
     };
   };
 
-  const { minValue, maxValue } = getMinMaxValues();
+  const { min, max } = getMinMaxValues();
 
-  console.log("minValue: ", minValue, "maxValue: ", maxValue);
+  console.log("min: ", min, "max: ", max);
   
   const renderTable = async function () {
     const colorScale = d3.scaleSequential(d3.interpolateRdYlGn)
-      .domain([minValue, maxValue]);
+      .domain([min, max]);
 
     const getTextWidth = function (text, font = '') {
       // re-use canvas object for better performance
