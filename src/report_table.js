@@ -100,15 +100,13 @@ const buildReportTable = function (
           return;
         }
         const cell = rowData[key];
-        console.log('Valor da célula:', cell.value);
-        console.log('Tipo da célula:', typeof cell.value);
         if (typeof cell.value === 'number') {
           values.push(cell.value);
         }
       });
     });
 
-    console.log(values);
+    console.log("Values Array: ", values);
     return {
       min: d3.min(values),
       max: d3.max(values)
@@ -361,6 +359,25 @@ const buildReportTable = function (
           return colorScale(d.value);  // Aplica a cor conforme a escala
         }
         return 'transparent';
+      })
+      .on('mouseover', function (d) {
+        // Substitua o conteúdo deste bloco pelo código abaixo:
+        // Remover hovers anteriores
+        d3.selectAll('td').classed('hover', false);
+    
+        // Destacar linha
+        d3.select(this.parentNode).selectAll('td').classed('hover', true);
+    
+        // Destacar coluna
+        var colIndex = this.cellIndex;
+        d3.selectAll('tbody tr').each(function() {
+          d3.select(this).selectAll('td').filter((_, i) => i === colIndex)
+            .classed('hover', true);
+        });
+      })
+      .on('mouseout', function (d) {
+        // Remover todos os hovers ao sair do mouse
+        d3.selectAll('td').classed('hover', false);
       })
       .on('mouseover', d => {
         if (dataTable.showHighlight) {
