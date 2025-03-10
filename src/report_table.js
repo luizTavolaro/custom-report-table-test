@@ -352,23 +352,16 @@ const buildReportTable = function (
         }
         return classes.join(' ');
       })
-      // Aqui é onde você aplica o Heatma
       .style('background-color', d => {
         if (typeof d.value === 'number') {
           console.log('Valor: ', d.value, 'Cor: ', colorScale(d.value));
-          return colorScale(d.value);  // Aplica a cor conforme a escala
+          return colorScale(d.value); 
         }
         return 'transparent';
       })
       .on('mouseover', function (d) {
-        // Substitua o conteúdo deste bloco pelo código abaixo:
-        // Remover hovers anteriores
         d3.selectAll('td').classed('hover', false);
-    
-        // Destacar linha
         d3.select(this.parentNode).selectAll('td').classed('hover', true);
-    
-        // Destacar coluna
         var colIndex = this.cellIndex;
         d3.selectAll('tbody tr').each(function() {
           d3.select(this).selectAll('td').filter((_, i) => i === colIndex)
@@ -376,7 +369,6 @@ const buildReportTable = function (
         });
       })
       .on('mouseout', function (d) {
-        // Remover todos os hovers ao sair do mouse
         d3.selectAll('td').classed('hover', false);
       })
       .on('mouseover', d => {

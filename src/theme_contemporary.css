@@ -43,7 +43,7 @@
 }
 
 .hover {
-  background-color: #ffffbb;
+  background-color: #FFFFBB !important;
   position: relative;
   z-index: 1;
 }
@@ -55,8 +55,8 @@ td.hover::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 0, 0.5); /* Amarelo semi-transparente */
-  pointer-events: none; /* Não interfere na interação do mouse */
+  background-color: #FFFFBB !important;
+  pointer-events: none;
   z-index: 1;
 }
 
