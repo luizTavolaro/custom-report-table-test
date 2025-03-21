@@ -292,12 +292,18 @@ const buildReportTable = function (
       .style('z-index', '0')
       .on('mouseover', function () {
         if (dataTable.showHighlight) {
-          this.classList.toggle('hover');
+          // this.classList.toggle('hover');
+          console.log('mouseover');
+          console.log('this: ', this);
+          this.style.backgroundColor = 'yellow';
         }
       })
       .on('mouseout', function () {
         if (dataTable.showHighlight) {
-          this.classList.toggle('hover');
+          // this.classList.toggle('hover');
+          console.log('mouseout');
+          console.log('this: ', this);
+          this.style.backgroundColor = 'red';
         }
       })
       .selectAll('td')
