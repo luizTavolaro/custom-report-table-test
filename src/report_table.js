@@ -295,7 +295,13 @@ const buildReportTable = function (
           // this.classList.toggle('hover');
           console.log('mouseover');
           console.log('this: ', this);
+          console.log('textContent: ', this.textContent);
           this.style.backgroundColor = 'yellow';
+
+          const els = this.querySelectorAll('*');
+          els.forEach(el => {
+            el.style.backgroundColor = 'yellow';
+          });
         }
       })
       .on('mouseout', function () {
@@ -303,7 +309,13 @@ const buildReportTable = function (
           // this.classList.toggle('hover');
           console.log('mouseout');
           console.log('this: ', this);
+          console.log('textContent: ', this.textContent);
           this.style.backgroundColor = 'red';
+
+          const els = this.querySelectorAll('*');
+          els.forEach(el => {
+            el.style.backgroundColor = 'red';
+          });
         }
       })
       .selectAll('td')
