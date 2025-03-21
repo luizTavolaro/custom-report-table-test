@@ -398,7 +398,11 @@ const buildReportTable = function (
           }
 
           var colElement = document.getElementById(id);
-          colElement.classList.toggle('hover');
+          // colElement.classList.toggle('hover');
+          console.log('mouseover');
+          console.log('colElement: ', colElement);
+          console.log('colElement.textContent: ', colElement.textContent);
+          colElement.style.backgroundColor = 'yellow';
         }
 
         if (dataTable.showTooltip && d.cell_style.includes('measure')) {
@@ -441,7 +445,11 @@ const buildReportTable = function (
             var id = ['col', d.rowid].join('').replace('.', '');
           }
           var colElement = document.getElementById(id);
-          colElement.classList.toggle('hover');
+          // colElement.classList.toggle('hover');
+          console.log('mouseout');
+          console.log('colElement: ', colElement);
+          console.log('colElement.textContent: ', colElement.textContent);
+          colElement.style.backgroundColor = 'red';
         }
 
         if (dataTable.showTooltip && d.cell_style.includes('measure')) {
