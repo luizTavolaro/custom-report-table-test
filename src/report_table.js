@@ -297,16 +297,16 @@ const buildReportTable = function (
       .style('z-index', '0')
       .on('mouseover', function () {
         if (dataTable.showHighlight) {
-          // this.classList.toggle('hover');
+          this.classList.toggle('hover');
           console.log('mouseover');
           console.log('this: ', this);
           console.log('textContent: ', this.textContent);
-          this.style.backgroundColor = 'yellow';
+          // this.style.backgroundColor = 'yellow';
 
-          const els = this.querySelectorAll('*');
-          els.forEach(el => {
-            el.style.backgroundColor = 'yellow';
-          });
+          // const els = this.querySelectorAll('*');
+          // els.forEach(el => {
+          //   el.style.backgroundColor = 'yellow';
+          // });
 
           // const rowClass = [...this.classList].find(cls => cls.startsWith('cell-row-'));
           // const colClass = [...this.classList].find(cls => cls.startsWith('cell-col-'));
@@ -327,16 +327,16 @@ const buildReportTable = function (
       })
       .on('mouseout', function () {
         if (dataTable.showHighlight) {
-          // this.classList.toggle('hover');
+          this.classList.toggle('hover');
           console.log('mouseout');
           console.log('this: ', this);
           console.log('textContent: ', this.textContent);
-          this.style.backgroundColor = 'red';
+          // this.style.backgroundColor = 'red';
 
-          const els = this.querySelectorAll('*');
-          els.forEach(el => {
-            el.style.backgroundColor = 'red';
-          });
+          // const els = this.querySelectorAll('*');
+          // els.forEach(el => {
+          //   el.style.backgroundColor = 'red';
+          // });
 
           // const rowClass = [...this.classList].find(cls => cls.startsWith('cell-row-'));
           // const colClass = [...this.classList].find(cls => cls.startsWith('cell-col-'));
