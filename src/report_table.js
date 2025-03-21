@@ -288,6 +288,11 @@ const buildReportTable = function (
       .data(dataTable.getDataRows())
       .enter()
       .append('tr')
+      .attr('data-row-index', (d, i) => i)
+      .attr('class', function (d, colIndex) {
+        const rowIndex = this.parentNode.getAttribute('data-row-index');
+        return `cell-row-${rowIndex} cell-col-${colIndex}`;
+      })
       .style('position', 'relative')
       .style('z-index', '0')
       .on('mouseover', function () {
@@ -298,10 +303,19 @@ const buildReportTable = function (
           console.log('textContent: ', this.textContent);
           this.style.backgroundColor = 'yellow';
 
-          const els = this.querySelectorAll('*');
-          els.forEach(el => {
-            el.style.backgroundColor = 'yellow';
-          });
+          // const els = this.querySelectorAll('*');
+          // els.forEach(el => {
+          //   el.style.backgroundColor = 'yellow';
+          // });
+
+          const rowClass = [...this.classList].find(cls => cls.startsWith('cell-row-'));
+          const colClass = [...this.classList].find(cls => cls.startsWith('cell-col-'));
+
+          console.log('Classe da linha:', rowClass);
+          console.log('Classe da coluna:', colClass); 
+      
+          d3.selectAll('.' + rowClass).style('backgroundColor', 'yellow');
+          d3.selectAll('.' + colClass).style('backgroundColor', 'yellow');
         }
       })
       .on('mouseout', function () {
@@ -312,10 +326,19 @@ const buildReportTable = function (
           console.log('textContent: ', this.textContent);
           this.style.backgroundColor = 'red';
 
-          const els = this.querySelectorAll('*');
-          els.forEach(el => {
-            el.style.backgroundColor = 'red';
-          });
+          // const els = this.querySelectorAll('*');
+          // els.forEach(el => {
+          //   el.style.backgroundColor = 'red';
+          // });
+
+          const rowClass = [...this.classList].find(cls => cls.startsWith('cell-row-'));
+          const colClass = [...this.classList].find(cls => cls.startsWith('cell-col-'));
+
+          console.log('Classe da linha:', rowClass);
+          console.log('Classe da coluna:', colClass); 
+      
+          d3.selectAll('.' + rowClass).style('backgroundColor', 'red');
+          d3.selectAll('.' + colClass).style('backgroundColor', 'red');
         }
       })
       .selectAll('td')
