@@ -303,26 +303,26 @@ const buildReportTable = function (
           console.log('textContent: ', this.textContent);
           this.style.backgroundColor = 'yellow';
 
-          // const els = this.querySelectorAll('*');
-          // els.forEach(el => {
-          //   el.style.backgroundColor = 'yellow';
-          // });
+          const els = this.querySelectorAll('*');
+          els.forEach(el => {
+            el.style.backgroundColor = 'yellow';
+          });
 
-          const rowClass = [...this.classList].find(cls => cls.startsWith('cell-row-'));
-          const colClass = [...this.classList].find(cls => cls.startsWith('cell-col-'));
+          // const rowClass = [...this.classList].find(cls => cls.startsWith('cell-row-'));
+          // const colClass = [...this.classList].find(cls => cls.startsWith('cell-col-'));
 
-          console.log('Classe da linha:', rowClass);
-          console.log('Classe da coluna:', colClass); 
+          // console.log('Classe da linha:', rowClass);
+          // console.log('Classe da coluna:', colClass); 
       
           // d3.selectAll('.' + rowClass).style('backgroundColor', 'yellow');
           // d3.selectAll('.' + colClass).style('backgroundColor', 'yellow');
 
-          document.querySelectorAll('.' + rowClass).forEach(el => {
-            el.style.backgroundColor = 'yellow';
-          });
-          document.querySelectorAll('.' + colClass).forEach(el => {
-            el.style.backgroundColor = 'yellow';
-          });
+          // document.querySelectorAll('.' + rowClass).forEach(el => {
+          //   el.style.backgroundColor = 'yellow';
+          // });
+          // document.querySelectorAll('.' + colClass).forEach(el => {
+          //   el.style.backgroundColor = 'yellow';
+          // });
         }
       })
       .on('mouseout', function () {
@@ -333,26 +333,26 @@ const buildReportTable = function (
           console.log('textContent: ', this.textContent);
           this.style.backgroundColor = 'red';
 
-          // const els = this.querySelectorAll('*');
-          // els.forEach(el => {
-          //   el.style.backgroundColor = 'red';
-          // });
+          const els = this.querySelectorAll('*');
+          els.forEach(el => {
+            el.style.backgroundColor = 'red';
+          });
 
-          const rowClass = [...this.classList].find(cls => cls.startsWith('cell-row-'));
-          const colClass = [...this.classList].find(cls => cls.startsWith('cell-col-'));
+          // const rowClass = [...this.classList].find(cls => cls.startsWith('cell-row-'));
+          // const colClass = [...this.classList].find(cls => cls.startsWith('cell-col-'));
 
-          console.log('Classe da linha:', rowClass);
-          console.log('Classe da coluna:', colClass); 
+          // console.log('Classe da linha:', rowClass);
+          // console.log('Classe da coluna:', colClass); 
       
           // d3.selectAll('.' + rowClass).style('backgroundColor', 'red');
           // d3.selectAll('.' + colClass).style('backgroundColor', 'red');
 
-          document.querySelectorAll('.' + rowClass).forEach(el => {
-            el.style.backgroundColor = 'red';
-          });
-          document.querySelectorAll('.' + colClass).forEach(el => {
-            el.style.backgroundColor = 'red';
-          });
+          // document.querySelectorAll('.' + rowClass).forEach(el => {
+          //   el.style.backgroundColor = 'red';
+          // });
+          // document.querySelectorAll('.' + colClass).forEach(el => {
+          //   el.style.backgroundColor = 'red';
+          // });
         }
       })
       .selectAll('td')
