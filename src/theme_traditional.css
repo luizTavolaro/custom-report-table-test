@@ -42,6 +42,10 @@
   display: none;
 }
 
+.hover {
+  background-color: #ffffbb;
+}
+
 td.hover {
   background-color: #ffffbb !important;
   position: relative;
