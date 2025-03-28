@@ -299,64 +299,32 @@ const buildReportTable = function (
       })
       .style('position', 'relative')
       .style('z-index', '0')
-      .on('mouseover', function () {
-        if (dataTable.showHighlight) {
-          this.classList.toggle('hover');
-          console.log('mouseover');
-          console.log('this: ', this);
-          console.log('textContent: ', this.textContent);
-          // this.style.backgroundColor = 'yellow';
+      .on('mouseover', d => {
+        if (d.column_index !== undefined) {
+          // Obter o índice da coluna
+          const colIndex = d.column_index;
 
-          // const els = this.querySelectorAll('*');
-          // els.forEach(el => {
-          //   el.style.backgroundColor = 'yellow';
-          // });
+          // Selecionar todas as células na mesma coluna
+          const cells = document.querySelectorAll(
+            `[data-column-index="${colIndex}"]`
+          );
 
-          // const rowClass = [...this.classList].find(cls => cls.startsWith('cell-row-'));
-          // const colClass = [...this.classList].find(cls => cls.startsWith('cell-col-'));
-
-          // console.log('Classe da linha:', rowClass);
-          // console.log('Classe da coluna:', colClass);
-
-          // d3.selectAll('.' + rowClass).style('backgroundColor', 'yellow');
-          // d3.selectAll('.' + colClass).style('backgroundColor', 'yellow');
-
-          // document.querySelectorAll('.' + rowClass).forEach(el => {
-          //   el.style.backgroundColor = 'yellow';
-          // });
-          // document.querySelectorAll('.' + colClass).forEach(el => {
-          //   el.style.backgroundColor = 'yellow';
-          // });
+          // Adicionar a classe de destaque a todas as células da coluna
+          cells.forEach(cell => cell.classList.add('highlight'));
         }
       })
-      .on('mouseout', function () {
-        if (dataTable.showHighlight) {
-          this.classList.toggle('hover');
-          console.log('mouseout');
-          console.log('this: ', this);
-          console.log('textContent: ', this.textContent);
-          // this.style.backgroundColor = 'red';
+      .on('mouseout', d => {
+        if (d.column_index !== undefined) {
+          // Obter o índice da coluna
+          const colIndex = d.column_index;
 
-          // const els = this.querySelectorAll('*');
-          // els.forEach(el => {
-          //   el.style.backgroundColor = 'red';
-          // });
+          // Selecionar todas as células na mesma coluna
+          const cells = document.querySelectorAll(
+            `[data-column-index="${colIndex}"]`
+          );
 
-          // const rowClass = [...this.classList].find(cls => cls.startsWith('cell-row-'));
-          // const colClass = [...this.classList].find(cls => cls.startsWith('cell-col-'));
-
-          // console.log('Classe da linha:', rowClass);
-          // console.log('Classe da coluna:', colClass);
-
-          // d3.selectAll('.' + rowClass).style('backgroundColor', 'red');
-          // d3.selectAll('.' + colClass).style('backgroundColor', 'red');
-
-          // document.querySelectorAll('.' + rowClass).forEach(el => {
-          //   el.style.backgroundColor = 'red';
-          // });
-          // document.querySelectorAll('.' + colClass).forEach(el => {
-          //   el.style.backgroundColor = 'red';
-          // });
+          // Remover a classe de destaque de todas as células da coluna
+          cells.forEach(cell => cell.classList.remove('highlight'));
         }
       })
       .selectAll('td')
