@@ -301,6 +301,7 @@ const buildReportTable = function (
       .style('z-index', '0')
       .on('mouseover', d => {
         if (dataTable.showHighlight) {
+          this.classList.toggle('hover');
           // Obter o índice da coluna
           const colIndex = d.column_index;
 
@@ -315,6 +316,7 @@ const buildReportTable = function (
       })
       .on('mouseout', d => {
         if (dataTable.showHighlight) {
+          this.classList.toggle('hover');
           // Obter o índice da coluna
           const colIndex = d.column_index;
 
