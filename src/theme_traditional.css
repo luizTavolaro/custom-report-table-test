@@ -43,7 +43,7 @@
 }
 
 td.hover {
-  background-color: #FFFFBB !important;
+  background-color: #ffffbb !important;
   position: relative;
   z-index: 1;
 }
@@ -55,13 +55,14 @@ td.hover::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #FFFFBB !important;
+  background-color: #ffffbb !important;
   pointer-events: none;
   z-index: 1;
 }
 
-tr.hover > td, col.hover {
-  background-color: #FFFFBB !important;
+tr.hover > td,
+col.hover {
+  background-color: #ffffbb !important;
   position: relative;
   z-index: 1;
 }
@@ -72,7 +73,8 @@ td {
 }
 
 .reportTable {
-  font-family: Open Sans, Helvetica, Arial, Noto Sans TC, Noto Sans SC, sans-serif;
+  font-family: Open Sans, Helvetica, Arial, Noto Sans TC, Noto Sans SC,
+    sans-serif;
   border-collapse: separate;
   border-spacing: 3px;
   table-layout: fixed;
@@ -151,6 +153,10 @@ th.headerCell {
 
 .dimension.transposed {
   font-weight: bold;
+}
+
+.highlight {
+  background-color: #ffffbb; /* Amarelo claro */
 }
 
 .rectElem.animated {

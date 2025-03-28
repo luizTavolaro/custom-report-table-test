@@ -85,15 +85,18 @@ const buildReportTable = function (
 
   const getMinMaxValues = () => {
     const values = [];
-    
+
     console.log('Data Rows:', dataTable.getDataRows());
-    console.log('Column Info:', dataTable.getTableRowColumns(dataTable.getDataRows()[0]));
+    console.log(
+      'Column Info:',
+      dataTable.getTableRowColumns(dataTable.getDataRows()[0])
+    );
 
     dataTable.getDataRows().forEach(row => {
-      if (row.id === "Total") {
+      if (row.id === 'Total') {
         return;
       }
-      const rowData = row.data
+      const rowData = row.data;
 
       Object.keys(rowData).forEach(key => {
         if (key.startsWith('$$$_row_total_$$$')) {
@@ -106,22 +109,23 @@ const buildReportTable = function (
       });
     });
 
-    console.log("Values Array: ", values);
+    console.log('Values Array: ', values);
     return {
       min: d3.min(values),
-      max: d3.max(values)
+      max: d3.max(values),
     };
   };
 
-  const { min, max } = getMinMaxValues();
+  const {min, max} = getMinMaxValues();
 
-  console.log("min: ", min, "max: ", max);
+  console.log('min: ', min, 'max: ', max);
 
-  const colorStart = config.heatmapColorStart || '#c3dcf5'
-  const colorEnd = config.heatmapColorEnd || '#4381ff';  
-  
+  const colorStart = config.heatmapColorStart || '#c3dcf5';
+  const colorEnd = config.heatmapColorEnd || '#4381ff';
+
   const renderTable = async function () {
-    const colorScale = d3.scaleSequential()
+    const colorScale = d3
+      .scaleSequential()
       .domain([min, max])
       .interpolator(d3.interpolateRgb(colorStart, colorEnd));
 
@@ -269,17 +273,17 @@ const buildReportTable = function (
       .style('font-size', config.headerFontSize + 'px')
       .attr('draggable', true)
       .call(drag)
-      .on('mouseover', function(cell) {
+      .on('mouseover', function (cell) {
         d3.select('#tooltip')
-            .style('left', d3.event.x + 'px')
-            .style('top', d3.event.y + 'px')
-            .html(cell.label);
+          .style('left', d3.event.x + 'px')
+          .style('top', d3.event.y + 'px')
+          .html(cell.label);
         d3.select('#tooltip').classed('hidden', false);
-        return dropTarget = cell
+        return (dropTarget = cell);
       })
-      .on('mouseout', function(cell) {
+      .on('mouseout', function (cell) {
         d3.select('#tooltip').classed('hidden', true);
-        return dropTarget = null
+        return (dropTarget = null);
       });
 
     var table_rows = table
@@ -312,8 +316,8 @@ const buildReportTable = function (
           // const colClass = [...this.classList].find(cls => cls.startsWith('cell-col-'));
 
           // console.log('Classe da linha:', rowClass);
-          // console.log('Classe da coluna:', colClass); 
-      
+          // console.log('Classe da coluna:', colClass);
+
           // d3.selectAll('.' + rowClass).style('backgroundColor', 'yellow');
           // d3.selectAll('.' + colClass).style('backgroundColor', 'yellow');
 
@@ -342,8 +346,8 @@ const buildReportTable = function (
           // const colClass = [...this.classList].find(cls => cls.startsWith('cell-col-'));
 
           // console.log('Classe da linha:', rowClass);
-          // console.log('Classe da coluna:', colClass); 
-      
+          // console.log('Classe da coluna:', colClass);
+
           // d3.selectAll('.' + rowClass).style('backgroundColor', 'red');
           // d3.selectAll('.' + colClass).style('backgroundColor', 'red');
 
@@ -366,7 +370,7 @@ const buildReportTable = function (
       // )
       .enter();
 
-      table_rows
+    table_rows
       .append('td')
       .text(d => {
         var text = '';
@@ -410,7 +414,7 @@ const buildReportTable = function (
       .style('background-color', d => {
         if (typeof d.value === 'number') {
           console.log('Valor: ', d.value, 'Cor: ', colorScale(d.value));
-          return colorScale(d.value); 
+          return colorScale(d.value);
         }
         return 'transparent';
       })
@@ -418,8 +422,10 @@ const buildReportTable = function (
         d3.selectAll('td').classed('hover', false);
         d3.select(this.parentNode).selectAll('td').classed('hover', true);
         var colIndex = this.cellIndex;
-        d3.selectAll('tbody tr').each(function() {
-          d3.select(this).selectAll('td').filter((_, i) => i === colIndex)
+        d3.selectAll('tbody tr').each(function () {
+          d3.select(this)
+            .selectAll('td')
+            .filter((_, i) => i === colIndex)
             .classed('hover', true);
         });
       })
@@ -427,24 +433,17 @@ const buildReportTable = function (
         d3.selectAll('td').classed('hover', false);
       })
       .on('mouseover', d => {
-        if (dataTable.showHighlight) {
-          if (!dataTable.transposeTable) {
-            var id = ['col', d.colid].join('').replace('.', '');
-          } else {
-            var id = ['col', d.rowid].join('').replace('.', '');
-          }
+        if (d.column_index !== undefined) {
+          // Obter o índice da coluna
+          const colIndex = d.column_index;
 
-          var colElement = document.getElementById(id);
-          colElement.classList.toggle('hover');
-          console.log('mouseover');
-          console.log('colElement: ', colElement);
-          console.log('colElement.textContent: ', colElement.textContent);
-          // colElement.style.backgroundColor = 'yellow';
+          // Selecionar todas as células na mesma coluna
+          const cells = document.querySelectorAll(
+            `[data-column-index="${colIndex}"]`
+          );
 
-          // const els = colElement.querySelectorAll('*');
-          // els.forEach(el => {
-          //   el.style.backgroundColor = 'yellow';
-          // });
+          // Adicionar a classe de destaque a todas as células da coluna
+          cells.forEach(cell => cell.classList.add('highlight'));
         }
 
         if (dataTable.showTooltip && d.cell_style.includes('measure')) {
@@ -480,23 +479,14 @@ const buildReportTable = function (
         }
       })
       .on('mouseout', d => {
-        if (dataTable.showHighlight) {
-          if (!dataTable.transposeTable) {
-            var id = ['col', d.colid].join('').replace('.', '');
-          } else {
-            var id = ['col', d.rowid].join('').replace('.', '');
-          }
-          var colElement = document.getElementById(id);
-          colElement.classList.toggle('hover');
-          console.log('mouseout');
-          console.log('colElement: ', colElement);
-          console.log('colElement.textContent: ', colElement.textContent);
-          // colElement.style.backgroundColor = 'red';
+        if (d.column_index !== undefined) {
+          const colIndex = d.column_index;
 
-          // const els = colElement.querySelectorAll('*');
-          // els.forEach(el => {
-          //   el.style.backgroundColor = 'red';
-          // });
+          const cells = document.querySelectorAll(
+            `[data-column-index="${colIndex}"]`
+          );
+
+          cells.forEach(cell => cell.classList.remove('highlight'));
         }
 
         if (dataTable.showTooltip && d.cell_style.includes('measure')) {
@@ -519,7 +509,7 @@ const buildReportTable = function (
           });
         }
       });
-    
+
     if (use_minicharts) {
       var barHeight = 16;
       var minicharts = table
