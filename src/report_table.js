@@ -300,7 +300,7 @@ const buildReportTable = function (
       .style('position', 'relative')
       .style('z-index', '0')
       .on('mouseover', d => {
-        if (d.column_index !== undefined) {
+        if (dataTable.showHighlight) {
           // Obter o índice da coluna
           const colIndex = d.column_index;
 
@@ -314,7 +314,7 @@ const buildReportTable = function (
         }
       })
       .on('mouseout', d => {
-        if (d.column_index !== undefined) {
+        if (dataTable.showHighlight) {
           // Obter o índice da coluna
           const colIndex = d.column_index;
 
