@@ -46,7 +46,7 @@
   background-color: #ffffbb;
 }
 
-td.hover {
+/* td.hover {
   background-color: #ffffbb !important;
   position: relative;
   z-index: 1;
@@ -74,7 +74,7 @@ col.hover {
 td {
   position: relative;
   overflow: hidden;
-}
+} */
 
 .reportTable {
   font-family: Open Sans, Helvetica, Arial, Noto Sans TC, Noto Sans SC,
