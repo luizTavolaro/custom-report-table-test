@@ -302,61 +302,11 @@ const buildReportTable = function (
       .on('mouseover', function () {
         if (dataTable.showHighlight) {
           this.classList.toggle('hover');
-          console.log('mouseover');
-          console.log('this: ', this);
-          console.log('textContent: ', this.textContent);
-          // this.style.backgroundColor = 'yellow';
-
-          // const els = this.querySelectorAll('*');
-          // els.forEach(el => {
-          //   el.style.backgroundColor = 'yellow';
-          // });
-
-          // const rowClass = [...this.classList].find(cls => cls.startsWith('cell-row-'));
-          // const colClass = [...this.classList].find(cls => cls.startsWith('cell-col-'));
-
-          // console.log('Classe da linha:', rowClass);
-          // console.log('Classe da coluna:', colClass);
-
-          // d3.selectAll('.' + rowClass).style('backgroundColor', 'yellow');
-          // d3.selectAll('.' + colClass).style('backgroundColor', 'yellow');
-
-          // document.querySelectorAll('.' + rowClass).forEach(el => {
-          //   el.style.backgroundColor = 'yellow';
-          // });
-          // document.querySelectorAll('.' + colClass).forEach(el => {
-          //   el.style.backgroundColor = 'yellow';
-          // });
         }
       })
       .on('mouseout', function () {
         if (dataTable.showHighlight) {
           this.classList.toggle('hover');
-          console.log('mouseout');
-          console.log('this: ', this);
-          console.log('textContent: ', this.textContent);
-          // this.style.backgroundColor = 'red';
-
-          // const els = this.querySelectorAll('*');
-          // els.forEach(el => {
-          //   el.style.backgroundColor = 'red';
-          // });
-
-          // const rowClass = [...this.classList].find(cls => cls.startsWith('cell-row-'));
-          // const colClass = [...this.classList].find(cls => cls.startsWith('cell-col-'));
-
-          // console.log('Classe da linha:', rowClass);
-          // console.log('Classe da coluna:', colClass);
-
-          // d3.selectAll('.' + rowClass).style('backgroundColor', 'red');
-          // d3.selectAll('.' + colClass).style('backgroundColor', 'red');
-
-          // document.querySelectorAll('.' + rowClass).forEach(el => {
-          //   el.style.backgroundColor = 'red';
-          // });
-          // document.querySelectorAll('.' + colClass).forEach(el => {
-          //   el.style.backgroundColor = 'red';
-          // });
         }
       })
       .selectAll('td')
@@ -418,20 +368,6 @@ const buildReportTable = function (
         }
         return 'transparent';
       })
-      .on('mouseover', function (d) {
-        d3.selectAll('td').classed('hover', false);
-        d3.select(this.parentNode).selectAll('td').classed('hover', true);
-        var colIndex = this.cellIndex;
-        d3.selectAll('tbody tr').each(function () {
-          d3.select(this)
-            .selectAll('td')
-            .filter((_, i) => i === colIndex)
-            .classed('hover', true);
-        });
-      })
-      .on('mouseout', function (d) {
-        d3.selectAll('td').classed('hover', false);
-      })
       .on('mouseover', d => {
         if (dataTable.showHighlight) {
           if (!dataTable.transposeTable) {
@@ -442,15 +378,6 @@ const buildReportTable = function (
 
           var colElement = document.getElementById(id);
           colElement.classList.toggle('hover');
-          console.log('mouseover');
-          console.log('colElement: ', colElement);
-          console.log('colElement.textContent: ', colElement.textContent);
-          // colElement.style.backgroundColor = 'yellow';
-
-          // const els = colElement.querySelectorAll('*');
-          // els.forEach(el => {
-          //   el.style.backgroundColor = 'yellow';
-          // });
         }
 
         if (dataTable.showTooltip && d.cell_style.includes('measure')) {
@@ -494,15 +421,6 @@ const buildReportTable = function (
           }
           var colElement = document.getElementById(id);
           colElement.classList.toggle('hover');
-          console.log('mouseout');
-          console.log('colElement: ', colElement);
-          console.log('colElement.textContent: ', colElement.textContent);
-          // colElement.style.backgroundColor = 'red';
-
-          // const els = colElement.querySelectorAll('*');
-          // els.forEach(el => {
-          //   el.style.backgroundColor = 'red';
-          // });
         }
 
         if (dataTable.showTooltip && d.cell_style.includes('measure')) {
