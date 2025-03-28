@@ -299,34 +299,64 @@ const buildReportTable = function (
       })
       .style('position', 'relative')
       .style('z-index', '0')
-      .on('mouseover', d => {
+      .on('mouseover', function () {
         if (dataTable.showHighlight) {
           this.classList.toggle('hover');
-          // Obter o índice da coluna
-          const colIndex = d.column_index;
+          console.log('mouseover');
+          console.log('this: ', this);
+          console.log('textContent: ', this.textContent);
+          // this.style.backgroundColor = 'yellow';
 
-          // Selecionar todas as células na mesma coluna
-          const cells = document.querySelectorAll(
-            `[data-column-index="${colIndex}"]`
-          );
+          // const els = this.querySelectorAll('*');
+          // els.forEach(el => {
+          //   el.style.backgroundColor = 'yellow';
+          // });
 
-          // Adicionar a classe de destaque a todas as células da coluna
-          cells.forEach(cell => cell.classList.add('highlight'));
+          // const rowClass = [...this.classList].find(cls => cls.startsWith('cell-row-'));
+          // const colClass = [...this.classList].find(cls => cls.startsWith('cell-col-'));
+
+          // console.log('Classe da linha:', rowClass);
+          // console.log('Classe da coluna:', colClass);
+
+          // d3.selectAll('.' + rowClass).style('backgroundColor', 'yellow');
+          // d3.selectAll('.' + colClass).style('backgroundColor', 'yellow');
+
+          // document.querySelectorAll('.' + rowClass).forEach(el => {
+          //   el.style.backgroundColor = 'yellow';
+          // });
+          // document.querySelectorAll('.' + colClass).forEach(el => {
+          //   el.style.backgroundColor = 'yellow';
+          // });
         }
       })
-      .on('mouseout', d => {
+      .on('mouseout', function () {
         if (dataTable.showHighlight) {
           this.classList.toggle('hover');
-          // Obter o índice da coluna
-          const colIndex = d.column_index;
+          console.log('mouseout');
+          console.log('this: ', this);
+          console.log('textContent: ', this.textContent);
+          // this.style.backgroundColor = 'red';
 
-          // Selecionar todas as células na mesma coluna
-          const cells = document.querySelectorAll(
-            `[data-column-index="${colIndex}"]`
-          );
+          // const els = this.querySelectorAll('*');
+          // els.forEach(el => {
+          //   el.style.backgroundColor = 'red';
+          // });
 
-          // Remover a classe de destaque de todas as células da coluna
-          cells.forEach(cell => cell.classList.remove('highlight'));
+          // const rowClass = [...this.classList].find(cls => cls.startsWith('cell-row-'));
+          // const colClass = [...this.classList].find(cls => cls.startsWith('cell-col-'));
+
+          // console.log('Classe da linha:', rowClass);
+          // console.log('Classe da coluna:', colClass);
+
+          // d3.selectAll('.' + rowClass).style('backgroundColor', 'red');
+          // d3.selectAll('.' + colClass).style('backgroundColor', 'red');
+
+          // document.querySelectorAll('.' + rowClass).forEach(el => {
+          //   el.style.backgroundColor = 'red';
+          // });
+          // document.querySelectorAll('.' + colClass).forEach(el => {
+          //   el.style.backgroundColor = 'red';
+          // });
         }
       })
       .selectAll('td')
@@ -403,17 +433,24 @@ const buildReportTable = function (
         d3.selectAll('td').classed('hover', false);
       })
       .on('mouseover', d => {
-        if (d.column_index !== undefined) {
-          // Obter o índice da coluna
-          const colIndex = d.column_index;
+        if (dataTable.showHighlight) {
+          if (!dataTable.transposeTable) {
+            var id = ['col', d.colid].join('').replace('.', '');
+          } else {
+            var id = ['col', d.rowid].join('').replace('.', '');
+          }
 
-          // Selecionar todas as células na mesma coluna
-          const cells = document.querySelectorAll(
-            `[data-column-index="${colIndex}"]`
-          );
+          var colElement = document.getElementById(id);
+          colElement.classList.toggle('hover');
+          console.log('mouseover');
+          console.log('colElement: ', colElement);
+          console.log('colElement.textContent: ', colElement.textContent);
+          // colElement.style.backgroundColor = 'yellow';
 
-          // Adicionar a classe de destaque a todas as células da coluna
-          cells.forEach(cell => cell.classList.add('highlight'));
+          // const els = colElement.querySelectorAll('*');
+          // els.forEach(el => {
+          //   el.style.backgroundColor = 'yellow';
+          // });
         }
 
         if (dataTable.showTooltip && d.cell_style.includes('measure')) {
@@ -449,14 +486,23 @@ const buildReportTable = function (
         }
       })
       .on('mouseout', d => {
-        if (d.column_index !== undefined) {
-          const colIndex = d.column_index;
+        if (dataTable.showHighlight) {
+          if (!dataTable.transposeTable) {
+            var id = ['col', d.colid].join('').replace('.', '');
+          } else {
+            var id = ['col', d.rowid].join('').replace('.', '');
+          }
+          var colElement = document.getElementById(id);
+          colElement.classList.toggle('hover');
+          console.log('mouseout');
+          console.log('colElement: ', colElement);
+          console.log('colElement.textContent: ', colElement.textContent);
+          // colElement.style.backgroundColor = 'red';
 
-          const cells = document.querySelectorAll(
-            `[data-column-index="${colIndex}"]`
-          );
-
-          cells.forEach(cell => cell.classList.remove('highlight'));
+          // const els = colElement.querySelectorAll('*');
+          // els.forEach(el => {
+          //   el.style.backgroundColor = 'red';
+          // });
         }
 
         if (dataTable.showTooltip && d.cell_style.includes('measure')) {
