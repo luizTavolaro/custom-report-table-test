@@ -372,6 +372,13 @@ const buildReportTable = function (
 
           var colElement = document.getElementById(id);
           colElement.classList.toggle('hover');
+
+          // Forçar a cor de fundo no mouseover
+          if (colElement.classList.contains('hover')) {
+            colElement.style.backgroundColor = '#ffffbb'; // Cor do highlight
+          } else {
+            colElement.style.backgroundColor = ''; // Restaura a cor original
+          }
         }
 
         if (dataTable.showTooltip && d.cell_style.includes('measure')) {
@@ -415,6 +422,13 @@ const buildReportTable = function (
           }
           var colElement = document.getElementById(id);
           colElement.classList.toggle('hover');
+
+          // Forçar a cor de fundo no mouseover
+          if (colElement.classList.contains('hover')) {
+            colElement.style.backgroundColor = '#ffffbb'; // Cor do highlight
+          } else {
+            colElement.style.backgroundColor = ''; // Restaura a cor original
+          }
         }
 
         if (dataTable.showTooltip && d.cell_style.includes('measure')) {
