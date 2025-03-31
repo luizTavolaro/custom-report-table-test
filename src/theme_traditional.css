@@ -43,7 +43,7 @@
 }
 
 .hover {
-  background-color: #ffffbb;
+  background-color: #ffffbb !important;
 }
 
 .reportTable {

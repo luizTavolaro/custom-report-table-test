@@ -83,51 +83,43 @@ const buildReportTable = function (
     return orderedGroup;
   };
 
-  // const getMinMaxValues = () => {
-  //   const values = [];
+  const getMinMaxValues = () => {
+    const values = [];
 
-  //   console.log('Data Rows:', dataTable.getDataRows());
-  //   console.log(
-  //     'Column Info:',
-  //     dataTable.getTableRowColumns(dataTable.getDataRows()[0])
-  //   );
+    dataTable.getDataRows().forEach(row => {
+      if (row.id === 'Total') {
+        return;
+      }
+      const rowData = row.data;
 
-  //   dataTable.getDataRows().forEach(row => {
-  //     if (row.id === 'Total') {
-  //       return;
-  //     }
-  //     const rowData = row.data;
+      Object.keys(rowData).forEach(key => {
+        if (key.startsWith('$$$_row_total_$$$')) {
+          return;
+        }
+        const cell = rowData[key];
+        if (typeof cell.value === 'number') {
+          values.push(cell.value);
+        }
+      });
+    });
 
-  //     Object.keys(rowData).forEach(key => {
-  //       if (key.startsWith('$$$_row_total_$$$')) {
-  //         return;
-  //       }
-  //       const cell = rowData[key];
-  //       if (typeof cell.value === 'number') {
-  //         values.push(cell.value);
-  //       }
-  //     });
-  //   });
+    console.log('Values Array: ', values);
+    return {
+      min: d3.min(values),
+      max: d3.max(values),
+    };
+  };
 
-  //   console.log('Values Array: ', values);
-  //   return {
-  //     min: d3.min(values),
-  //     max: d3.max(values),
-  //   };
-  // };
+  const {min, max} = getMinMaxValues();
 
-  // const {min, max} = getMinMaxValues();
-
-  // console.log('min: ', min, 'max: ', max);
-
-  // const colorStart = config.heatmapColorStart || '#c3dcf5';
-  // const colorEnd = config.heatmapColorEnd || '#4381ff';
+  const colorStart = config.heatmapColorStart || '#c3dcf5';
+  const colorEnd = config.heatmapColorEnd || '#4381ff';
 
   const renderTable = async function () {
-    // const colorScale = d3
-    //   .scaleSequential()
-    //   .domain([min, max])
-    //   .interpolator(d3.interpolateRgb(colorStart, colorEnd));
+    const colorScale = d3
+      .scaleSequential()
+      .domain([min, max])
+      .interpolator(d3.interpolateRgb(colorStart, colorEnd));
     const getTextWidth = function (text, font = '') {
       // re-use canvas object for better performance
       var canvas =
@@ -291,13 +283,13 @@ const buildReportTable = function (
       .data(dataTable.getDataRows())
       .enter()
       .append('tr')
-      // .attr('data-row-index', (d, i) => i)
-      // .attr('class', function (d, colIndex) {
-      //   const rowIndex = this.parentNode.getAttribute('data-row-index');
-      //   return `cell-row-${rowIndex} cell-col-${colIndex}`;
-      // })
-      // .style('position', 'relative')
-      // .style('z-index', '0')
+      .attr('data-row-index', (d, i) => i)
+      .attr('class', function (d, colIndex) {
+        const rowIndex = this.parentNode.getAttribute('data-row-index');
+        return `cell-row-${rowIndex} cell-col-${colIndex}`;
+      })
+      .style('position', 'relative')
+      .style('z-index', '0')
       .on('mouseover', function () {
         if (dataTable.showHighlight) {
           this.classList.toggle('hover');
@@ -312,11 +304,11 @@ const buildReportTable = function (
       .data(row =>
         dataTable.getTableRowColumns(row).map(column => row.data[column.id])
       )
-      // .data(row =>
-      //   sortByColumnSeries(dataTable.getTableRowColumns(row)).map(
-      //     column => row.data[column.id]
-      //   )
-      // )
+      .data(row =>
+        sortByColumnSeries(dataTable.getTableRowColumns(row)).map(
+          column => row.data[column.id]
+        )
+      )
       .enter();
 
     table_rows
@@ -364,13 +356,12 @@ const buildReportTable = function (
         }
         return classes.join(' ');
       })
-      // .style('background-color', d => {
-      //   if (typeof d.value === 'number') {
-      //     console.log('Valor: ', d.value, 'Cor: ', colorScale(d.value));
-      //     return colorScale(d.value);
-      //   }
-      //   return 'transparent';
-      // })
+      .style('background-color', d => {
+        if (typeof d.value === 'number') {
+          return colorScale(d.value);
+        }
+        return 'transparent';
+      })
       .on('mouseover', d => {
         if (dataTable.showHighlight) {
           if (!dataTable.transposeTable) {
@@ -624,33 +615,6 @@ looker.plugins.visualizations.add({
     // ERROR HANDLING
 
     this.clearErrors();
-
-    // Heatmap logic
-    const applyHeatmap = () => {
-      const table = element.querySelector('table'); // Assuming the table is rendered in the element
-      if (!table) return;
-
-      const cells = table.querySelectorAll('td'); // Select all table cells
-      const values = Array.from(cells).map(
-        cell => parseFloat(cell.textContent) || 0
-      );
-
-      const min = Math.min(...values);
-      const max = Math.max(...values);
-
-      // Normalize and apply color
-      cells.forEach(cell => {
-        const value = parseFloat(cell.textContent) || 0;
-        const normalized = (value - min) / (max - min); // Normalize between 0 and 1
-        const color = `rgba(255, ${Math.round(
-          255 * (1 - normalized)
-        )}, ${Math.round(255 * normalized)}, 0.8)`; // Green to Red
-        cell.style.backgroundColor = color;
-      });
-    };
-
-    // Call the heatmap function after rendering the table
-    setTimeout(applyHeatmap, 0);
 
     // empty pivot(s)...no measures
     // FIXME: temporarily disabled until we test this feature.
