@@ -625,6 +625,33 @@ looker.plugins.visualizations.add({
 
     this.clearErrors();
 
+    // Heatmap logic
+    const applyHeatmap = () => {
+      const table = element.querySelector('table'); // Assuming the table is rendered in the element
+      if (!table) return;
+
+      const cells = table.querySelectorAll('td'); // Select all table cells
+      const values = Array.from(cells).map(
+        cell => parseFloat(cell.textContent) || 0
+      );
+
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+
+      // Normalize and apply color
+      cells.forEach(cell => {
+        const value = parseFloat(cell.textContent) || 0;
+        const normalized = (value - min) / (max - min); // Normalize between 0 and 1
+        const color = `rgba(255, ${Math.round(
+          255 * (1 - normalized)
+        )}, ${Math.round(255 * normalized)}, 0.8)`; // Green to Red
+        cell.style.backgroundColor = color;
+      });
+    };
+
+    // Call the heatmap function after rendering the table
+    setTimeout(applyHeatmap, 0);
+
     // empty pivot(s)...no measures
     // FIXME: temporarily disabled until we test this feature.
     // if (
