@@ -290,16 +290,16 @@ const buildReportTable = function (
       })
       .style('position', 'relative')
       .style('z-index', '0')
-      .on('mouseover', function () {
-        if (dataTable.showHighlight) {
-          this.classList.toggle('hover');
-        }
-      })
-      .on('mouseout', function () {
-        if (dataTable.showHighlight) {
-          this.classList.toggle('hover');
-        }
-      })
+      // .on('mouseover', function () {
+      //   if (dataTable.showHighlight) {
+      //     this.classList.toggle('hover');
+      //   }
+      // })
+      // .on('mouseout', function () {
+      //   if (dataTable.showHighlight) {
+      //     this.classList.toggle('hover');
+      //   }
+      // })
       .selectAll('td')
       .data(row =>
         dataTable.getTableRowColumns(row).map(column => row.data[column.id])
