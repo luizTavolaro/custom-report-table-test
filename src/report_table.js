@@ -83,52 +83,51 @@ const buildReportTable = function (
     return orderedGroup;
   };
 
-  const getMinMaxValues = () => {
-    const values = [];
+  // const getMinMaxValues = () => {
+  //   const values = [];
 
-    console.log('Data Rows:', dataTable.getDataRows());
-    console.log(
-      'Column Info:',
-      dataTable.getTableRowColumns(dataTable.getDataRows()[0])
-    );
+  //   console.log('Data Rows:', dataTable.getDataRows());
+  //   console.log(
+  //     'Column Info:',
+  //     dataTable.getTableRowColumns(dataTable.getDataRows()[0])
+  //   );
 
-    dataTable.getDataRows().forEach(row => {
-      if (row.id === 'Total') {
-        return;
-      }
-      const rowData = row.data;
+  //   dataTable.getDataRows().forEach(row => {
+  //     if (row.id === 'Total') {
+  //       return;
+  //     }
+  //     const rowData = row.data;
 
-      Object.keys(rowData).forEach(key => {
-        if (key.startsWith('$$$_row_total_$$$')) {
-          return;
-        }
-        const cell = rowData[key];
-        if (typeof cell.value === 'number') {
-          values.push(cell.value);
-        }
-      });
-    });
+  //     Object.keys(rowData).forEach(key => {
+  //       if (key.startsWith('$$$_row_total_$$$')) {
+  //         return;
+  //       }
+  //       const cell = rowData[key];
+  //       if (typeof cell.value === 'number') {
+  //         values.push(cell.value);
+  //       }
+  //     });
+  //   });
 
-    console.log('Values Array: ', values);
-    return {
-      min: d3.min(values),
-      max: d3.max(values),
-    };
-  };
+  //   console.log('Values Array: ', values);
+  //   return {
+  //     min: d3.min(values),
+  //     max: d3.max(values),
+  //   };
+  // };
 
-  const {min, max} = getMinMaxValues();
+  // const {min, max} = getMinMaxValues();
 
-  console.log('min: ', min, 'max: ', max);
+  // console.log('min: ', min, 'max: ', max);
 
-  const colorStart = config.heatmapColorStart || '#c3dcf5';
-  const colorEnd = config.heatmapColorEnd || '#4381ff';
+  // const colorStart = config.heatmapColorStart || '#c3dcf5';
+  // const colorEnd = config.heatmapColorEnd || '#4381ff';
 
   const renderTable = async function () {
-    const colorScale = d3
-      .scaleSequential()
-      .domain([min, max])
-      .interpolator(d3.interpolateRgb(colorStart, colorEnd));
-
+    // const colorScale = d3
+    //   .scaleSequential()
+    //   .domain([min, max])
+    //   .interpolator(d3.interpolateRgb(colorStart, colorEnd));
     const getTextWidth = function (text, font = '') {
       // re-use canvas object for better performance
       var canvas =
@@ -292,13 +291,13 @@ const buildReportTable = function (
       .data(dataTable.getDataRows())
       .enter()
       .append('tr')
-      .attr('data-row-index', (d, i) => i)
-      .attr('class', function (d, colIndex) {
-        const rowIndex = this.parentNode.getAttribute('data-row-index');
-        return `cell-row-${rowIndex} cell-col-${colIndex}`;
-      })
-      .style('position', 'relative')
-      .style('z-index', '0')
+      // .attr('data-row-index', (d, i) => i)
+      // .attr('class', function (d, colIndex) {
+      //   const rowIndex = this.parentNode.getAttribute('data-row-index');
+      //   return `cell-row-${rowIndex} cell-col-${colIndex}`;
+      // })
+      // .style('position', 'relative')
+      // .style('z-index', '0')
       .on('mouseover', function () {
         if (dataTable.showHighlight) {
           this.classList.toggle('hover');
@@ -325,24 +324,28 @@ const buildReportTable = function (
       .text(d => {
         var text = '';
         if (Array.isArray(d.value)) {
+          // cell is a list or number_list
           text = !(d.rendered === null) ? d.rendered : d.value.join(' ');
         } else if (
           typeof d.value === 'object' &&
           d.value !== null &&
           typeof d.value.series !== 'undefined'
         ) {
+          // cell is a turtle
           text = null;
         } else if (d.html) {
+          // cell has HTML defined
           var parser = new DOMParser();
           var parsed_html = parser.parseFromString(d.html, 'text/html');
           text = parsed_html.documentElement.textContent;
         } else if (d.rendered || d.rendered === '') {
+          // could be deliberate choice to render empty string
           text = d.rendered;
         } else {
           text = d.value;
         }
         text = String(text);
-        return text ? text.replace('-', '\u2011') : text;
+        return text ? text.replace('-', '\u2011') : text; // prevents wrapping on minus sign / hyphen
       })
       .attr('rowspan', d => d.rowspan)
       .attr('colspan', d => d.colspan)
@@ -361,13 +364,13 @@ const buildReportTable = function (
         }
         return classes.join(' ');
       })
-      .style('background-color', d => {
-        if (typeof d.value === 'number') {
-          console.log('Valor: ', d.value, 'Cor: ', colorScale(d.value));
-          return colorScale(d.value);
-        }
-        return 'transparent';
-      })
+      // .style('background-color', d => {
+      //   if (typeof d.value === 'number') {
+      //     console.log('Valor: ', d.value, 'Cor: ', colorScale(d.value));
+      //     return colorScale(d.value);
+      //   }
+      //   return 'transparent';
+      // })
       .on('mouseover', d => {
         if (dataTable.showHighlight) {
           if (!dataTable.transposeTable) {
