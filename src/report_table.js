@@ -364,15 +364,14 @@ const buildReportTable = function (
       })
       .on('mouseover', d => {
         if (dataTable.showHighlight) {
-          let id = dataTable.transposeTable ? `col${d.rowid}` : `col${d.colid}`;
-          id = id.replace('.', '');
+          if (!dataTable.transposeTable) {
+            var id = ['col', d.colid].join('').replace('.', '');
+          } else {
+            var id = ['col', d.rowid].join('').replace('.', '');
+          }
 
-          let colElements = document.querySelectorAll(`[id='${id}']`);
-
-          colElements.forEach(el => {
-            el.dataset.heatmapColor = el.style.backgroundColor; // Salva a cor original do heatmap
-            el.style.backgroundColor = '#ffffbb'; // Aplica a cor do highlight
-          });
+          var colElement = document.getElementById(id);
+          colElement.classList.toggle('hover');
         }
 
         if (dataTable.showTooltip && d.cell_style.includes('measure')) {
@@ -409,14 +408,13 @@ const buildReportTable = function (
       })
       .on('mouseout', d => {
         if (dataTable.showHighlight) {
-          let id = dataTable.transposeTable ? `col${d.rowid}` : `col${d.colid}`;
-          id = id.replace('.', '');
-
-          let colElements = document.querySelectorAll(`[id='${id}']`);
-
-          colElements.forEach(el => {
-            el.style.backgroundColor = el.dataset.heatmapColor; // Restaura a cor original do heatmap
-          });
+          if (!dataTable.transposeTable) {
+            var id = ['col', d.colid].join('').replace('.', '');
+          } else {
+            var id = ['col', d.rowid].join('').replace('.', '');
+          }
+          var colElement = document.getElementById(id);
+          colElement.classList.toggle('hover');
         }
 
         if (dataTable.showTooltip && d.cell_style.includes('measure')) {
