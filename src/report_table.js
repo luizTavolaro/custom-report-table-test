@@ -290,16 +290,23 @@ const buildReportTable = function (
       })
       .style('position', 'relative')
       .style('z-index', '0')
-      // .on('mouseover', function () {
-      //   if (dataTable.showHighlight) {
-      //     this.classList.toggle('hover');
-      //   }
-      // })
-      // .on('mouseout', function () {
-      //   if (dataTable.showHighlight) {
-      //     this.classList.toggle('hover');
-      //   }
-      // })
+      .on('mouseover', function () {
+        if (dataTable.showHighlight) {
+          this.classList.toggle('hover');
+          this.dataset.heatmapColor = this.style.backgroundColor || '';
+          this.style.setProperty('background-color', '#ffffbb', 'important');
+        }
+      })
+      .on('mouseout', function () {
+        if (dataTable.showHighlight) {
+          this.classList.toggle('hover');
+          this.style.setProperty(
+            'background-color',
+            this.dataset.heatmapColor || '',
+            'important'
+          );
+        }
+      })
       .selectAll('td')
       .data(row =>
         dataTable.getTableRowColumns(row).map(column => row.data[column.id])
@@ -372,13 +379,6 @@ const buildReportTable = function (
 
           var colElement = document.getElementById(id);
           colElement.classList.toggle('hover');
-
-          // Forçar a cor de fundo no mouseover
-          if (colElement.classList.contains('hover')) {
-            colElement.style.backgroundColor = '#ffffbb'; // Cor do highlight
-          } else {
-            colElement.style.backgroundColor = ''; // Restaura a cor original
-          }
         }
 
         if (dataTable.showTooltip && d.cell_style.includes('measure')) {
@@ -422,13 +422,6 @@ const buildReportTable = function (
           }
           var colElement = document.getElementById(id);
           colElement.classList.toggle('hover');
-
-          // Forçar a cor de fundo no mouseover
-          if (colElement.classList.contains('hover')) {
-            colElement.style.backgroundColor = '#ffffbb'; // Cor do highlight
-          } else {
-            colElement.style.backgroundColor = ''; // Restaura a cor original
-          }
         }
 
         if (dataTable.showTooltip && d.cell_style.includes('measure')) {
