@@ -293,15 +293,11 @@ const buildReportTable = function (
       .on('mouseover', function () {
         if (dataTable.showHighlight) {
           this.classList.add('hover');
-          this.dataset.heatmapColor = this.style.backgroundColor || '';
-          this.style.backgroundColor = '#ffffbb !important';
-          this.style.zIndex = '10';
         }
       })
       .on('mouseout', function () {
         if (dataTable.showHighlight) {
           this.classList.remove('hover');
-          this.style.backgroundColor = this.dataset.heatmapColor || '';
         }
       })
       .selectAll('td')
