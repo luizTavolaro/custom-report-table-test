@@ -119,7 +119,7 @@ const buildReportTable = function (
     const colorScale = d3
       .scaleSequential()
       .domain([min, max])
-      .interpolator(d3.interpolateRgb(colorStart, colorEnd));
+      .interpolator(d3.interpolateRgb(colorStart + '80', colorEnd + '80'));
     const getTextWidth = function (text, font = '') {
       // re-use canvas object for better performance
       var canvas =
