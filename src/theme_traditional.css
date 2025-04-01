@@ -52,6 +52,9 @@
   border-collapse: separate;
   border-spacing: 3px;
   table-layout: fixed;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: auto;
 }
 
 th.headerCell {
