@@ -53,6 +53,7 @@
   border-spacing: 3px;
   table-layout: fixed;
   width: 100%;
+  display: block;
   overflow-y: auto;
   overflow-x: auto;
 }
@@ -61,6 +62,7 @@ th.headerCell {
   border-bottom: 1px solid #000000 !important;
   font-weight: bold;
   padding: 5px;
+  min-width: 55px;
 }
 
 .headerCell.merged {
@@ -84,7 +86,6 @@ th.headerCell {
 .rowCell {
   vertical-align: super;
   padding-left: 5px;
-  min-width: 55px;
 }
 
 .rowCell.merged {
