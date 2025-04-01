@@ -292,19 +292,16 @@ const buildReportTable = function (
       .style('z-index', '0')
       .on('mouseover', function () {
         if (dataTable.showHighlight) {
-          this.classList.toggle('hover');
+          this.classList.add('hover');
           this.dataset.heatmapColor = this.style.backgroundColor || '';
-          this.style.setProperty('background-color', '#ffffbb', 'important');
+          this.style.backgroundColor = '#ffffbb !important';
+          this.style.zIndex = '10';
         }
       })
       .on('mouseout', function () {
         if (dataTable.showHighlight) {
-          this.classList.toggle('hover');
-          this.style.setProperty(
-            'background-color',
-            this.dataset.heatmapColor || '',
-            'important'
-          );
+          this.classList.remove('hover');
+          this.style.backgroundColor = this.dataset.heatmapColor || '';
         }
       })
       .selectAll('td')
